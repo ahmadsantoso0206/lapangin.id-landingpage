@@ -1,0 +1,58 @@
+name: Deploy Landing Page
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "index.html"
+      - "styles.css"
+      - "script.js"
+      - "lapangin.nginx.conf"
+      - "deploy/**"
+      - ".github/workflows/deploy-landing-page.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SSH_OPTS: >-
+        -o ServerAliveInterval=30
+        -o ServerAliveCountMax=20
+        -o TCPKeepAlive=yes
+        -o StrictHostKeyChecking=yes
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s' "${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}" > ~/.ssh/lapangin_ci
+          chmod 600 ~/.ssh/lapangin_ci
+          ssh-keyscan -H 103.103.23.184 >> ~/.ssh/known_hosts
+
+      - name: Prepare remote upload directory
+        run: |
+          ssh $SSH_OPTS -i ~/.ssh/lapangin_ci ahmaddwi@103.103.23.184 \
+            "mkdir -p ~/lapangin-ci/landing-page/deploy/landing-page"
+
+      - name: Upload landing page sources
+        run: |
+          rsync -az --delete \
+            --exclude .git \
+            --exclude .github \
+            -e "ssh $SSH_OPTS -i ~/.ssh/lapangin_ci" \
+            ./ ahmaddwi@103.103.23.184:~/lapangin-ci/landing-page/
+
+      - name: Debug uploaded remote files
+        run: |
+          ssh $SSH_OPTS -i ~/.ssh/lapangin_ci ahmaddwi@103.103.23.184 \
+            "ls -la ~/lapangin-ci/landing-page && ls -la ~/lapangin-ci/landing-page/deploy/landing-page"
+
+      - name: Run remote deployment
+        run: |
+          ssh $SSH_OPTS -i ~/.ssh/lapangin_ci ahmaddwi@103.103.23.184 \
+            "chmod +x ~/lapangin-ci/landing-page/deploy/landing-page/remote-deploy.sh && bash ~/lapangin-ci/landing-page/deploy/landing-page/remote-deploy.sh"
