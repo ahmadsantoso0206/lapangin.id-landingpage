@@ -239,5 +239,22 @@
     </footer>
 
     <script src="./script.js"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyB6ev0vYE8LqBF9b4xgmpzn6RKfrhCYDTA",
+        authDomain: "lapangin-2df65.firebaseapp.com",
+        projectId: "lapangin-2df65",
+        storageBucket: "lapangin-2df65.firebasestorage.app",
+        messagingSenderId: "546375988388",
+        appId: "1:546375988388:web:4a5c50982847060d6d2231",
+        measurementId: "G-YYZB4K3D9T",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+    </script>
   </body>
 </html>
