@@ -8,6 +8,7 @@ on:
       - "index.html"
       - "styles.css"
       - "script.js"
+      - "googled4c1505454d64395.html"
       - "lapangin.nginx.conf"
       - "deploy/**"
       - ".github/workflows/deploy-landing-page.yml"
